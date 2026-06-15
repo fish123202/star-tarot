@@ -56,7 +56,7 @@ export const tarotTools = {
       spreadType: z.enum(["single", "three_ppf"]),
       questionTopic: z
         .string()
-        .describe("用户问题的主题关键词，如：感情、事业、健身"),
+        .describe("用户问题的主题关键词，如：感情、事业、日常决策"),
     }),
     execute: async ({ spreadType, questionTopic }) => {
       const entry = {

@@ -44,17 +44,17 @@
 
 ### 目录对照
 
-| 路径 | 职责 | 类比 Spring Boot |
-|------|------|------------------|
-| `src/app/api/chat/route.ts` | 聊天 API 入口 | `@RestController` |
-| `src/lib/ai/tools.ts` | Tool 定义与执行 | `@Service` 工具方法 |
-| `src/lib/ai/provider.ts` | 模型客户端配置 | 数据源 / Feign Client |
-| `src/lib/tarot/cards.ts` | 78 张牌静态数据 | 实体 + 常量库 |
-| `src/lib/prompts/system.ts` | System Prompt | 业务规则配置 |
-| `src/components/ChatPanel.tsx` | 聊天主界面 | 前端页面 |
-| `src/components/TarotCardArt.tsx` | 卡牌 SVG 插画 | 视图组件 |
-| `src/components/ShuffleAnimation.tsx` | 洗牌动画 | 视图组件 |
-| `src/components/StarField.tsx` | 星空 / 流星 / 鼠标交互 | 视图组件 |
+| 路径 | 职责 |
+|------|------|
+| `src/app/api/chat/route.ts` | 聊天 API 入口，流式响应 |
+| `src/lib/ai/tools.ts` | Tool 定义与执行 |
+| `src/lib/ai/provider.ts` | 模型客户端配置 |
+| `src/lib/tarot/cards.ts` | 78 张牌静态数据 |
+| `src/lib/prompts/system.ts` | System Prompt |
+| `src/components/ChatPanel.tsx` | 聊天主界面 |
+| `src/components/TarotCardArt.tsx` | 卡牌 SVG 插画 |
+| `src/components/ShuffleAnimation.tsx` | 洗牌动画 |
+| `src/components/StarField.tsx` | 星空 / 流星 / 鼠标交互 |
 
 ### 技术栈
 
@@ -74,13 +74,13 @@
 
 ---
 
-## 2. 关键 Prompt 与 Vibe 思路
+## 2. 关键 Prompt 与迭代思路
 
-### Vibe 开发流程
+### 开发迭代
 
 1. **先跑通最小链路**：用户输入 → API → 模型返回文字（无 Tool）
 2. **再加 Tool**：让模型必须调用 `draw_cards`，避免「幻觉牌面」
-3. **迭代 Prompt**：用 10+ 真实问题测试（含健身/感情/事业），调整语气与长度
+3. **迭代 Prompt**：用多种真实场景测试（感情、事业、日常决策等），调整语气与长度
 4. **加边界**：免责声明、禁止医疗/法律/投资建议
 
 ### System Prompt 设计要点（见 `src/lib/prompts/system.ts`）
@@ -90,7 +90,7 @@
 | 角色 | 温和、有画面感的塔罗解读师 |
 | 硬约束 | 必须基于 `draw_cards` 返回的真实牌面，不可编造 |
 | 结构 | 共情 → 逐牌解读 → 总结建议 → 免责声明 |
-| 个性化 | 健身相关问题可结合「力量」「战车」等牌给可执行鼓励 |
+| 场景适配 | 自律、习惯养成类问题可结合「力量」「战车」等牌给出可执行建议 |
 | 长度 | 400–600 字，适合流式阅读 |
 
 ### 动态上下文注入
@@ -103,7 +103,7 @@
 
 ### 3.1 流式响应（SSE）
 
-使用 Vercel AI SDK 的 `streamText()`，通过 `toUIMessageStreamResponse()` 以 **Server-Sent Events** 推送到前端；前端 `useChat` 逐字渲染，满足 JD「理解流式响应」要求。
+使用 Vercel AI SDK 的 `streamText()`，通过 `toUIMessageStreamResponse()` 以 **Server-Sent Events** 推送到前端；前端 `useChat` 逐字渲染，降低首字等待时间。
 
 ```typescript
 // src/app/api/chat/route.ts（简化）
@@ -146,7 +146,7 @@ return result.toUIMessageStreamResponse();
 ### 3.4 Token 成本（DeepSeek 估算）
 
 - 单次解读约 1k–3k tokens（含 system + tools + 回复）
-- DeepSeek 价格极低，100 元预算可支撑数千次测试
+- DeepSeek 单次调用成本较低，适合高频调试 Prompt 与 Tool 链路
 
 ### 3.5 模型切换
 
@@ -197,7 +197,7 @@ git push -u origin main
 4. 点击 **Deploy**，约 1–2 分钟完成
 5. 获得免费域名：`https://star-tarot-xxx.vercel.app`（自动 HTTPS）
 
-### 5.3 自定义域名 + DNS（可选加分项）
+### 5.3 自定义域名 + DNS（可选）
 
 若购买域名（如 `startarot.cn`）：
 
@@ -209,7 +209,7 @@ git push -u origin main
 | 4 | 子域名 `www`：CNAME → `cname.vercel-dns.com` |
 | 5 | 等待 DNS 生效（几分钟~48h），Vercel 自动签发 SSL 证书 |
 
-**无域名也完全可以投递**：使用 `*.vercel.app` 即可，HTTPS 已内置。
+不绑定自定义域名时，直接使用 `*.vercel.app` 即可，HTTPS 已内置。
 
 ---
 
