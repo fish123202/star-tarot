@@ -3,20 +3,521 @@
 @tailwind utilities;
 
 :root {
-  --background: #0b0618;
-  --foreground: #f5f0ff;
+  --background: #152520;
+  --foreground: #f0ebe0;
+  --accent: #d4af37;
+  --accent-dark: #8a7020;
+  --card-bg: #f8f3e8;
+  --card-bg-deep: #e8dfc8;
+  --card-ink: #2c2416;
+  --muted: #a89f8f;
+  --border: rgba(212, 175, 55, 0.45);
+  --panel-bg: #1e3830;
 }
 
 body {
   color: var(--foreground);
-  background:
-    radial-gradient(ellipse at top, rgba(139, 92, 246, 0.18), transparent 55%),
-    radial-gradient(ellipse at bottom right, rgba(217, 70, 239, 0.12), transparent 45%),
-    var(--background);
-  font-family: var(--font-noto), "PingFang SC", "Microsoft YaHei", sans-serif;
+  background-color: var(--background);
+  background-image:
+    radial-gradient(ellipse at 50% -10%, rgba(212, 175, 55, 0.1), transparent 55%),
+    radial-gradient(ellipse at 80% 90%, rgba(212, 175, 55, 0.05), transparent 40%),
+    radial-gradient(ellipse at 50% 100%, rgba(0, 0, 0, 0.35), transparent 50%);
+  font-family: var(--font-sans), "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
+/* 动态金星 */
+.star-wrapper {
+  position: absolute;
+  will-change: transform;
+}
+
+.star {
+  position: relative;
+  display: block;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    #fffef0 0%,
+    #f0d878 35%,
+    #d4af37 55%,
+    transparent 75%
+  );
+  box-shadow:
+    0 0 6px #d4af37,
+    0 0 12px rgba(212, 175, 55, 0.45);
+  animation: twinkle ease-in-out infinite;
+  opacity: 0;
+}
+
+.star-bright {
+  box-shadow:
+    0 0 10px #ffe566,
+    0 0 20px rgba(212, 175, 55, 0.65),
+    0 0 36px rgba(255, 248, 220, 0.25);
+}
+
+.star-sparkle {
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.star-sparkle::before,
+.star-sparkle::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  background: linear-gradient(transparent, #ffe566, transparent);
+  transform: translate(-50%, -50%);
+}
+
+.star-sparkle::before {
+  width: 2px;
+  height: 140%;
+}
+
+.star-sparkle::after {
+  width: 140%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #ffe566, transparent);
+}
+
+.star-drift {
+  animation: twinkle-drift ease-in-out infinite;
+}
+
+/* 流星群：右上 → 左下，拖尾渐隐 */
+.meteor-unit {
+  position: absolute;
+  opacity: 0;
+  will-change: transform, opacity;
+  animation: meteor-shower-cycle linear infinite;
+}
+
+.meteor-streak {
+  position: relative;
+  display: block;
+  height: 6px;
+  background: linear-gradient(
+    to left,
+    transparent 0%,
+    rgba(255, 230, 120, 0.08) 12%,
+    rgba(255, 230, 120, 0.45) 38%,
+    rgba(255, 240, 200, 0.9) 72%,
+    #fffef0 90%,
+    #ffe566 100%
+  );
+  border-radius: 999px;
+  transform: rotate(var(--meteor-angle, 135deg));
+  transform-origin: right center;
+  filter: drop-shadow(0 0 6px rgba(212, 175, 55, 0.85));
+}
+
+.meteor-streak::after {
+  content: "";
+  position: absolute;
+  right: -3px;
+  top: 50%;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: #fffef0;
+  transform: translate(50%, -50%);
+  box-shadow:
+    0 0 10px #ffe566,
+    0 0 22px rgba(212, 175, 55, 0.9),
+    0 0 40px rgba(255, 248, 220, 0.45);
+}
+
+@keyframes meteor-shower-cycle {
+  0%,
+  7%,
+  100% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0);
+  }
+  0.4% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0);
+  }
+  0.8% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+  2.5% {
+    opacity: 0.95;
+    transform: translate3d(-18vw, 16vh, 0);
+  }
+  4% {
+    opacity: 0.55;
+    transform: translate3d(-38vw, 34vh, 0);
+  }
+  5.5% {
+    opacity: 0.15;
+    transform: translate3d(-58vw, 52vh, 0);
+  }
+  6.8% {
+    opacity: 0;
+    transform: translate3d(-72vw, 64vh, 0);
+  }
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.2;
+    transform: scale(0.85);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.25);
+  }
+}
+
+@keyframes twinkle-drift {
+  0%,
+  100% {
+    opacity: 0.15;
+    transform: scale(0.8) translate(0, 0);
+  }
+  50% {
+    opacity: 0.95;
+    transform: scale(1.2) translate(10px, -12px);
+  }
+}
+
+/* 鼠标金星拖尾 */
+.cursor-trail-dot {
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(
+    circle,
+    #fffef0 0%,
+    #ffe566 40%,
+    rgba(212, 175, 55, 0.4) 65%,
+    transparent 100%
+  );
+  box-shadow: 0 0 6px rgba(212, 175, 55, 0.6);
+  will-change: left, top, width, height, opacity;
+  opacity: 0;
+}
+
+.cursor-trail-head {
+  box-shadow:
+    0 0 10px #ffe566,
+    0 0 20px rgba(212, 175, 55, 0.75),
+    0 0 36px rgba(255, 248, 220, 0.35);
 }
 
 * {
   scrollbar-width: thin;
-  scrollbar-color: rgba(167, 139, 250, 0.4) transparent;
+  scrollbar-color: rgba(212, 175, 55, 0.4) transparent;
+}
+
+@layer components {
+  /* 主面板：厚边框 + 浮起 */
+  .panel-raised {
+    background: linear-gradient(165deg, #234038 0%, var(--panel-bg) 40%, #1a3028 100%);
+    border: 2px solid var(--accent-dark);
+    box-shadow:
+      0 8px 32px rgba(0, 0, 0, 0.45),
+      0 2px 8px rgba(0, 0, 0, 0.3),
+      inset 0 1px 0 rgba(212, 175, 55, 0.25),
+      inset 0 -2px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  /* 塔罗牌：立体牌面 */
+  .card-frame {
+    position: relative;
+    background: linear-gradient(
+      160deg,
+      var(--card-bg) 0%,
+      var(--card-bg-deep) 100%
+    );
+    border: 3px solid var(--accent);
+    box-shadow:
+      0 6px 0 var(--accent-dark),
+      0 10px 24px rgba(0, 0, 0, 0.5),
+      inset 0 2px 4px rgba(255, 255, 255, 0.5),
+      inset 0 -3px 6px rgba(44, 36, 22, 0.12);
+    transform: translateY(-2px);
+  }
+
+  .card-frame::before,
+  .card-frame::after {
+    content: "";
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border: 2px solid var(--accent-dark);
+  }
+
+  .card-frame::before {
+    top: 6px;
+    left: 6px;
+    border-right: none;
+    border-bottom: none;
+  }
+
+  .card-frame::after {
+    bottom: 6px;
+    right: 6px;
+    border-left: none;
+    border-top: none;
+  }
+
+  /* 牌阵按钮 */
+  .btn-spread {
+    border: 2px solid var(--accent-dark);
+    background: linear-gradient(180deg, #2a4a40 0%, #1e3830 100%);
+    box-shadow:
+      0 3px 0 var(--accent-dark),
+      0 4px 8px rgba(0, 0, 0, 0.35);
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+  }
+
+  .btn-spread:active:not(:disabled) {
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 var(--accent-dark);
+  }
+
+  .btn-spread-active {
+    background: linear-gradient(180deg, #3d5a48 0%, #2a4a40 100%);
+    border-color: var(--accent);
+    color: var(--accent);
+    box-shadow:
+      0 3px 0 #6b5520,
+      0 0 16px rgba(212, 175, 55, 0.25),
+      inset 0 1px 0 rgba(212, 175, 55, 0.2);
+  }
+
+  /* 求签按钮 */
+  .btn-submit {
+    border: 2px solid var(--accent);
+    background: linear-gradient(180deg, #c9a227 0%, #8a7020 100%);
+    color: #1a2e28;
+    font-weight: 600;
+    box-shadow:
+      0 4px 0 #5c4a18,
+      0 6px 16px rgba(0, 0, 0, 0.4);
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+  }
+
+  .btn-submit:hover:not(:disabled) {
+    background: linear-gradient(180deg, #d4af37 0%, #9a8028 100%);
+  }
+
+  .btn-submit:active:not(:disabled) {
+    transform: translateY(3px);
+    box-shadow: 0 1px 0 #5c4a18;
+  }
+
+  /* 输入框：内凹 */
+  .input-inset {
+    border: 2px solid #0f1f1a;
+    background: linear-gradient(180deg, #0f1f1a 0%, #152520 100%);
+    box-shadow:
+      inset 0 3px 8px rgba(0, 0, 0, 0.5),
+      inset 0 1px 2px rgba(0, 0, 0, 0.3),
+      0 1px 0 rgba(212, 175, 55, 0.15);
+  }
+
+  .input-inset:focus {
+    border-color: var(--accent-dark);
+    box-shadow:
+      inset 0 3px 8px rgba(0, 0, 0, 0.5),
+      0 0 0 2px rgba(212, 175, 55, 0.2);
+  }
+
+  /* 解读区块 */
+  .block-inset {
+    background: rgba(0, 0, 0, 0.2);
+    border: 2px solid rgba(212, 175, 55, 0.2);
+    box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.35);
+  }
+
+  .block-user {
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.12) 0%, rgba(0, 0, 0, 0.15) 100%);
+    border: 2px solid var(--accent-dark);
+    border-right: 4px solid var(--accent);
+    box-shadow:
+      3px 3px 0 rgba(0, 0, 0, 0.25),
+      inset 0 1px 0 rgba(212, 175, 55, 0.15);
+  }
+
+  .divider-gold {
+    height: 3px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      var(--accent-dark) 20%,
+      var(--accent) 50%,
+      var(--accent-dark) 80%,
+      transparent
+    );
+    box-shadow: 0 1px 2px rgba(212, 175, 55, 0.3);
+  }
+
+  /* 塔罗牌面插画 */
+  .tarot-playing-card {
+    position: relative;
+    width: 8.5rem;
+    aspect-ratio: 2 / 3;
+    border: 3px solid var(--accent);
+    border-radius: 6px;
+    box-shadow:
+      0 6px 0 var(--accent-dark),
+      0 10px 24px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+    background: var(--card-bg);
+  }
+
+  .tarot-playing-card-reversed {
+    transform: rotate(180deg);
+  }
+
+  .tarot-card-art {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .tarot-card-art-svg {
+    flex: 1;
+    width: 100%;
+    padding: 6px;
+  }
+
+  .tarot-card-art-footer {
+    border-top: 1px solid rgba(212, 175, 55, 0.35);
+    background: rgba(0, 0, 0, 0.25);
+    padding: 4px 6px;
+    text-align: center;
+  }
+
+  .tarot-card-art-name {
+    font-family: var(--font-serif), serif;
+    font-size: 11px;
+    font-weight: 600;
+    color: #f0ebe0;
+    line-height: 1.2;
+  }
+
+  .tarot-card-art-en {
+    font-size: 7px;
+    color: rgba(212, 175, 55, 0.75);
+    letter-spacing: 0.05em;
+    margin-top: 1px;
+  }
+
+  .tarot-playing-card-badge {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    font-size: 8px;
+    padding: 2px 5px;
+    background: rgba(0, 0, 0, 0.55);
+    border: 1px solid rgba(212, 175, 55, 0.5);
+    color: var(--accent);
+    font-family: var(--font-serif), serif;
+  }
+
+  .tarot-playing-card-reversed .tarot-playing-card-badge {
+    transform: rotate(180deg);
+  }
+
+  /* 洗牌动画 */
+  .shuffle-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem 0;
+  }
+
+  .shuffle-deck {
+    position: relative;
+    width: 140px;
+    height: 110px;
+  }
+
+  .shuffle-card {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 56px;
+    aspect-ratio: 2 / 3;
+    margin-left: -28px;
+    margin-top: -42px;
+    animation: shuffle-fan 1.4s ease-in-out infinite;
+    animation-delay: calc(var(--i) * 0.12s);
+  }
+
+  .shuffle-card-back {
+    width: 100%;
+    height: 100%;
+    border: 2px solid var(--accent);
+    border-radius: 4px;
+    background: linear-gradient(145deg, #1a2848 0%, #0f1828 100%);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .shuffle-card-star {
+    color: var(--accent);
+    font-size: 18px;
+    opacity: 0.8;
+  }
+
+  .shuffle-label {
+    margin-top: 0.75rem;
+    font-family: var(--font-serif), serif;
+    font-size: 0.875rem;
+    font-style: italic;
+    color: rgba(212, 175, 55, 0.85);
+  }
+
+  @keyframes shuffle-fan {
+    0%,
+    100% {
+      transform: translate(0, 0) rotate(0deg);
+    }
+    20% {
+      transform: translate(calc(var(--i) * 8px - 16px), -6px)
+        rotate(calc(var(--i) * 4deg - 8deg));
+    }
+    40% {
+      transform: translate(calc(var(--i) * -6px + 12px), 4px)
+        rotate(calc(var(--i) * -3deg + 6deg));
+    }
+    60% {
+      transform: translate(calc(var(--i) * 10px - 20px), -4px)
+        rotate(calc(var(--i) * 5deg - 10deg));
+    }
+    80% {
+      transform: translate(calc(var(--i) * -4px + 8px), 2px)
+        rotate(calc(var(--i) * -2deg + 4deg));
+    }
+  }
+
+  @keyframes card-reveal {
+    from {
+      opacity: 0;
+      transform: translateY(16px) scale(0.92);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  .animate-card-reveal {
+    animation: card-reveal 0.5s ease-out both;
+  }
 }

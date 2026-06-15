@@ -11,6 +11,15 @@ const config: Config = {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        accent: "var(--accent)",
+        "card-face": "var(--card-bg)",
+        "card-ink": "var(--card-ink)",
+        muted: "var(--muted)",
+        border: "var(--border)",
+      },
+      fontFamily: {
+        serif: ["var(--font-serif)", "Noto Serif SC", "Songti SC", "serif"],
+        sans: ["var(--font-sans)", "PingFang SC", "Microsoft YaHei", "sans-serif"],
       },
     },
   },

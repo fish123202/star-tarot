@@ -1,16 +1,23 @@
 import type { Metadata } from "next";
-import { Noto_Sans_SC } from "next/font/google";
+import { Noto_Sans_SC, Noto_Serif_SC } from "next/font/google";
+import { StarField } from "@/components/StarField";
 import "./globals.css";
 
 const notoSans = Noto_Sans_SC({
   subsets: ["latin"],
-  weight: ["400", "500", "700"],
-  variable: "--font-noto",
+  weight: ["400", "500"],
+  variable: "--font-sans",
+});
+
+const notoSerif = Noto_Serif_SC({
+  subsets: ["latin"],
+  weight: ["400", "600", "700"],
+  variable: "--font-serif",
 });
 
 export const metadata: Metadata = {
   title: "星语 Tarot | AI 塔罗解读",
-  description: "AI 驱动的塔罗占卜 Demo — 流式解读 · Function Calling · Next.js",
+  description: "静心一问，牌面自会作答 — AI 塔罗解读",
 };
 
 export default function RootLayout({
@@ -20,8 +27,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh-CN">
-      <body className={`${notoSans.variable} min-h-screen antialiased`}>
-        {children}
+      <body
+        className={`${notoSans.variable} ${notoSerif.variable} relative min-h-screen antialiased`}
+      >
+        <StarField />
+        <div className="relative z-10">{children}</div>
       </body>
     </html>
   );

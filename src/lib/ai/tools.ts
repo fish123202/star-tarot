@@ -38,6 +38,8 @@ export const tarotTools = {
           id: card.id,
           name: card.name,
           nameEn: card.nameEn,
+          arcana: card.arcana,
+          suit: card.suit,
           orientation,
           position,
           meaning:
