@@ -1,0 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #0b0618;
+  --foreground: #f5f0ff;
+}
+
+body {
+  color: var(--foreground);
+  background:
+    radial-gradient(ellipse at top, rgba(139, 92, 246, 0.18), transparent 55%),
+    radial-gradient(ellipse at bottom right, rgba(217, 70, 239, 0.12), transparent 45%),
+    var(--background);
+  font-family: var(--font-noto), "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(167, 139, 250, 0.4) transparent;
+}
