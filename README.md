@@ -1,7 +1,23 @@
 # 星语 Tarot — AI 塔罗解读 Demo
+
 > 线上 Demo：https://star-tarot-late-fish-s-projects.vercel.app  
 > GitHub：https://github.com/fish123202/star-tarot
-**提问 → 抽牌（Function Calling）→ 流式解读**。
+
+**提问 → 洗牌 → 抽牌（Function Calling）→ 流式解读**
+
+---
+
+## 功能亮点
+
+| 模块 | 说明 |
+|------|------|
+| AI 流式解读 | DeepSeek + SSE 逐字输出 |
+| Function Calling | `draw_cards` 从 78 张本地牌库抽牌 |
+| 纸牌桌 UI | 深绿桌布 + 金色立体面板，非模板化紫色 AI 风 |
+| 卡牌插画 | SVG 符号牌面（大/小阿卡纳），正逆位翻转 |
+| 洗牌动画 | 求签后、出牌前展示牌背洗动 |
+| 动态星空 | 240 颗随机金星、鼠标排斥、光标拖尾 |
+| 流星群 | 右上 → 左下划过，拖尾渐隐，成群出现 |
 
 ---
 
@@ -10,7 +26,8 @@
 ```
 ┌──────────────────────────────────────────────────────────────┐
 │  Browser（React Client Components）                           │
-│  ChatPanel · useChat · 流式渲染消息 + 牌面卡片                   │
+│  ChatPanel · ShuffleAnimation · DrawnCards · StarField        │
+│  useChat · 流式消息 · 卡牌 SVG · 星空/流星/鼠标拖尾             │
 └────────────────────────────┬─────────────────────────────────┘
                              │ POST /api/chat（UIMessage stream）
                              ▼
@@ -34,15 +51,26 @@
 | `src/lib/ai/provider.ts` | 模型客户端配置 | 数据源 / Feign Client |
 | `src/lib/tarot/cards.ts` | 78 张牌静态数据 | 实体 + 常量库 |
 | `src/lib/prompts/system.ts` | System Prompt | 业务规则配置 |
-| `src/components/ChatPanel.tsx` | 聊天 UI | 前端页面（Thymeleaf/Vue） |
+| `src/components/ChatPanel.tsx` | 聊天主界面 | 前端页面 |
+| `src/components/TarotCardArt.tsx` | 卡牌 SVG 插画 | 视图组件 |
+| `src/components/ShuffleAnimation.tsx` | 洗牌动画 | 视图组件 |
+| `src/components/StarField.tsx` | 星空 / 流星 / 鼠标交互 | 视图组件 |
 
 ### 技术栈
 
 - **框架**：Next.js 14（App Router）+ TypeScript
-- **UI**：Tailwind CSS
+- **UI**：Tailwind CSS + 自定义 CSS 动画（纸牌桌主题）
+- **字体**：Noto Serif SC + Noto Sans SC
 - **AI**：Vercel AI SDK（`ai` + `@ai-sdk/react` + `@ai-sdk/openai`）
 - **LLM**：DeepSeek（默认，`deepseek-chat`）/ Agnes（可切换）
 - **部署**：Vercel（免费 HTTPS 域名）
+
+### 前端交互说明
+
+1. 用户点击「求签」→ `ShuffleAnimation` 展示洗牌
+2. 模型调用 `draw_cards` → `DrawnCards` + `TarotCardArt` 渲染牌面
+3. `StarField` 在客户端挂载后生成随机星点（避免 Hydration 报错）
+4. 鼠标移动时星点排斥、金色拖尾跟随
 
 ---
 
@@ -100,9 +128,11 @@ return result.toUIMessageStreamResponse();
 **调用时序：**
 
 ```
-用户提问 → 模型收到 system + messages
+用户提问 → ShuffleAnimation（洗牌中）
+         → 模型收到 system + messages
          → 模型调用 draw_cards(spreadType)
-         → 本地 execute() 返回真实牌面 JSON
+         → 本地 execute() 返回牌面 JSON（含 id / 正逆位）
+         → DrawnCards 渲染 SVG 牌面 + 翻出动画
          → 模型基于 tool result 流式生成解读
          → （可选）调用 log_reading 记录主题
 ```
