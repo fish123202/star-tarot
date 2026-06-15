@@ -20,10 +20,6 @@ export default function Home() {
       <section className="flex min-h-[620px] flex-1 flex-col rounded-3xl border border-white/10 bg-white/[0.03] p-4 shadow-2xl shadow-violet-950/50 sm:p-6">
         <ChatPanel />
       </section>
-
-      <footer className="mt-6 text-center text-xs text-violet-400/50">
-        27 届全栈实习 Demo · Next.js + Vercel AI SDK · 预算友好（DeepSeek）
-      </footer>
     </main>
   );
 }
