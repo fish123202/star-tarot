@@ -1,8 +1,8 @@
 # 星语 Tarot — AI 塔罗解读 Demo
 
 > 27 届实习投递作品 · 后端背景（Java/Spring Boot）+ AI 协作全栈 Demo  
-> 线上 Demo：（部署后填写 Vercel 链接）  
-> GitHub：（推送后填写仓库链接）
+> 线上 Demo：https://star-tarot-late-fish-s-projects.vercel.app  
+> GitHub：https://github.com/fish123202/star-tarot
 
 面向 [AI 应用实习岗位](../职位详情/职位详情.md) 的投递 Demo：**提问 → 抽牌（Function Calling）→ 流式解读**。
 
